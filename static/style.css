@@ -1,0 +1,62 @@
+/* Poore page ki setting */
+body { margin: 0; font-family: Arial; }
+
+/* Navbar ki sajaawat */
+.navbar {
+  background-color: #333;
+  color: white;
+  display: flex; /* Isse items ek line mein aa jate hain */
+  justify-content: space-between; /* Logo ek taraf, menu dusri taraf */
+  padding: 15px 50px;
+  align-items: center;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none; /* Dots hatane ke liye */
+}
+
+.nav-links li { margin-left: 20px; }
+
+.nav-links a {
+  color: white;
+  text-decoration: none; /* Underline hatane ke liye */
+}
+
+.hero {
+  height: 80vh; /* Screen ki 80% unchai (height) lega */
+  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+              url('https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1352');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+    align-items: center;
+  color: white;
+  text-align: center;
+}
+
+.btn {
+  background-color: #ff4757;
+  color: white;
+  padding: 12px 25px;
+  text-decoration: none;
+  border-radius: 30px;
+  font-weight: bold;
+}
+/* Jab screen 600px se choti ho (Mobile) */
+@media (max-width: 600px) {
+  .navbar {
+    flex-direction: column; /* Menu ko upar-neeche kar do */
+    padding: 10px;
+  }
+  
+  .nav-links {
+    padding: 0;
+    margin-top: 10px;
+  }
+
+  .hero h1 {
+    font-size: 24px; /* Mobile par heading choti kar do */
+  }
+}
