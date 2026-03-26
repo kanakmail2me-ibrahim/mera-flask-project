@@ -1,20 +1,30 @@
 from flask import Flask, render_template, request, redirect
-import sqlite3
+import psycopg2 # sqlite3 ki jagah
+import os
 
 app = Flask(__name__)
 
 # 1. Sabse pehle Database ka kaam (Init)
+# Render se Database ki URL pakadna
+DATABASE_URL = "postgresql://mera_database_user:vszbyD8AN1Gc8FwuHJwXBInCETEkbNfz@dpg-d72c533uibrs73b9eie0-a/mera_database"
+
+def get_db_connection():
+    conn = psycopg2.connect(DATABASE_URL)
+    return conn
+
+# Table banane ka tareeka (Thoda sa SQL syntax badal jayega)
 def init_db():
-    conn = sqlite3.connect('database.db')
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY, -- 'AUTOINCREMENT' ki jagah 'SERIAL'
             name TEXT NOT NULL,
             email TEXT NOT NULL
         )
     ''')
     conn.commit()
+    cursor.close()
     conn.close()
 
 # Server shuru hone se pehle database taiyar karein
