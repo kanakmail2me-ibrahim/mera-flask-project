@@ -1,50 +1,35 @@
 import os
 import psycopg2
 from flask import Flask, render_template, request, redirect
-from dotenv import load_dotenv # Secret files padhne ke liye
+# Note: Production mein 'dotenv' sirf local testing ke liye hota hai, 
+# Render par hum direct 'os.environ' use karte hain.
 
-load_dotenv() # .env file se data load karein
 app = Flask(__name__)
 
-# Database se connect karne ka professional function
+# Connection Function (Professional Way)
 def get_db_connection():
-    # 'DATABASE_URL' hum Render ki settings mein dalenge
-    url = os.environ.get("DATABASE_URL")
-    conn = psycopg2.connect(url)
+    # DATABASE_URL hum Render ki settings mein se uthayenge
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL'))
     return conn
 
-# Table banane ka tareeka (Thoda sa SQL syntax badal jayega)
-def init_db():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id SERIAL PRIMARY KEY, -- 'AUTOINCREMENT' ki jagah 'SERIAL'
-            name TEXT NOT NULL,
-            email TEXT NOT NULL
-        )
-    ''')
-    conn.commit()
-    cursor.close()
-    conn.close()
+@app.route("/")
+def home():
+    return render_template("index.html")
 
-# Server shuru hone se pehle database taiyar karein
-init_db()
-
-# 2. Saare Routes (Raste) yahan likhein
 @app.route("/submit", methods=["POST"])
 def submit_form():
     naam = request.form.get("username")
-    email = request.form.get("usermessage")
+    paigam = request.form.get("usermessage")
     
     conn = get_db_connection()
     cur = conn.cursor()
-    # SQL Injection se bachne ke liye hamesha %s use karein (Production Standard)
-    cur.execute("INSERT INTO users (name, email) VALUES (%s, %s)", (naam, email))
+    # %s use karna zaroori hai 'SQL Injection' se bachne ke liye
+    cur.execute("INSERT INTO users (name, email) VALUES (%s, %s)", (naam, paigam))
     conn.commit()
     cur.close()
     conn.close()
-    return redirect("/")
+    
+    return f"<h1>Shukriya {naam}! Aapka data Neon Cloud par save ho gaya hai.</h1>"
     
 @app.route("/admin")
 def admin_page():
