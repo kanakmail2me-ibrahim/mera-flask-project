@@ -1,15 +1,16 @@
-from flask import Flask, render_template, request, redirect
-import psycopg2 # sqlite3 ki jagah
 import os
+import psycopg2
+from flask import Flask, render_template, request, redirect
+from dotenv import load_dotenv # Secret files padhne ke liye
 
+load_dotenv() # .env file se data load karein
 app = Flask(__name__)
 
-# 1. Sabse pehle Database ka kaam (Init)
-# Render se Database ki URL pakadna
-DATABASE_URL = "postgresql://mera_database_user:vszbyD8AN1Gc8FwuHJwXBInCETEkbNfz@dpg-d72c533uibrs73b9eie0-a/mera_database"
-
+# Database se connect karne ka professional function
 def get_db_connection():
-    conn = psycopg2.connect(DATABASE_URL)
+    # 'DATABASE_URL' hum Render ki settings mein dalenge
+    url = os.environ.get("DATABASE_URL")
+    conn = psycopg2.connect(url)
     return conn
 
 # Table banane ka tareeka (Thoda sa SQL syntax badal jayega)
@@ -31,23 +32,20 @@ def init_db():
 init_db()
 
 # 2. Saare Routes (Raste) yahan likhein
-@app.route("/")
-def home():
-    return render_template("index.html")
-
 @app.route("/submit", methods=["POST"])
 def submit_form():
     naam = request.form.get("username")
-    paigam = request.form.get("usermessage")
+    email = request.form.get("usermessage")
     
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO users (name, email) VALUES (?, ?)", (naam, paigam))
+    conn = get_db_connection()
+    cur = conn.cursor()
+    # SQL Injection se bachne ke liye hamesha %s use karein (Production Standard)
+    cur.execute("INSERT INTO users (name, email) VALUES (%s, %s)", (naam, email))
     conn.commit()
+    cur.close()
     conn.close()
+    return redirect("/")
     
-    return f"<h1>Shukriya {naam}! Aapka message save ho gaya hai.</h1>"
-
 @app.route("/admin")
 def admin_page():
     # 1. Database se saara data nikalna
